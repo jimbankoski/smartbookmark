@@ -1,0 +1,284 @@
+// Copyright 2026 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/* General Body Styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f7f9;
+    color: #333;
+    margin: 0;
+    padding: 24px;
+    min-width: 500px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h1, h2 {
+    color: #1a202c;
+    font-weight: 600;
+}
+
+h1 {
+    font-size: 2em;
+    margin-bottom: 8px;
+}
+
+h2 {
+    font-size: 1.5em;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-top: 32px;
+}
+
+/* Section Styling */
+section {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Form Elements */
+label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #4a5568;
+}
+
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    box-sizing: border-box; /* Important */
+    font-size: 1em;
+    transition: border-color 0.2s;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 1px #4299e1;
+}
+
+textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+/* Button Styles */
+button {
+    font-family: inherit;
+    font-size: 1em;
+    font-weight: 500;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* General Save/Add Button */
+#save-options,
+#add-prompt-button {
+    background-color: #4299e1;
+    color: white;
+    width: auto;
+}
+
+#save-options:hover,
+#add-prompt-button:hover {
+    background-color: #3182ce;
+}
+
+/* Icon Buttons (Edit, Delete, Save Edit, Cancel) */
+.prompt-actions button, .icon-button {
+    background-color: transparent;
+    border: 1px solid #cbd5e0;
+    color: #4a5568;
+    padding: 6px;
+    width: 32px; /* Fixed width for icons */
+    height: 32px;
+}
+
+.prompt-actions button:hover, .icon-button:hover {
+    background-color: #edf2f7;
+    border-color: #a0aec0;
+}
+
+.prompt-actions .delete-button,
+.prompt-actions .cancel-edit-button {
+    border-color: #e53e3e;
+    color: #e53e3e;
+}
+
+.prompt-actions .delete-button:hover,
+.prompt-actions .cancel-edit-button:hover {
+    background-color: #fed7d7;
+}
+
+.prompt-actions .save-edit-button {
+    border-color: #48bb78;
+    color: #48bb78;
+}
+.prompt-actions .save-edit-button:hover {
+    background-color: #c6f6d5;
+}
+
+
+/* Prompt Management Layout */
+#prompt-management #add-prompt-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#add-prompt-form label {
+    margin-bottom: 4px;
+    margin-top: 8px; /* Add some space above the labels */
+}
+
+#add-prompt-form label:first-of-type {
+    margin-top: 0;
+}
+
+#add-prompt-form input[type="text"],
+#add-prompt-form textarea {
+    width: 100%;
+    margin-bottom: 0; /* Handled by gap on parent */
+}
+
+#add-prompt-form button {
+    margin-top: 16px; /* Space above the button */
+    width: auto; /* Reset to auto from 100% in general button style */
+    align-self: flex-start; /* Align button to the left */
+}
+
+#prompts-list {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.prompt-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+}
+
+.prompt-details {
+    flex-grow: 1;
+}
+
+.prompt-name {
+    font-weight: 600;
+    font-size: 1.1em;
+    color: #2d3748;
+}
+
+.prompt-prompt {
+    font-size: 0.95em;
+    color: #718096;
+    margin-top: 4px;
+    white-space: pre-wrap; /* preserves formatting */
+}
+
+.prompt-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: 16px;
+}
+
+/* Edit State Styling */
+.prompt-item .edit-prompt-name,
+.prompt-item .edit-prompt-prompt {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+/* API Model Toggle (from previous styles, slightly adjusted) */
+.api-model-selection {
+  display: flex;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px; /* smaller */
+  height: 28px; /* smaller */
+  margin-left: 10px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px; /* smaller */
+  width: 20px;  /* smaller */
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #4299e1;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #4299e1;
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px); /* adjusted */
+}
+
+.slider.round {
+  border-radius: 28px; /* adjusted */
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}

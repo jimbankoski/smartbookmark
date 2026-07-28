@@ -1,0 +1,59 @@
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Page Creator Options</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Page Creator Options</h1>
+
+  <section id="api-settings">
+    <h2>API Settings</h2>
+    <label for="api-key">Gemini API Key:</label>
+    <input type="text" id="api-key" name="api-key" placeholder="Enter your Gemini API Key">
+    <div class="api-model-selection">
+      <label for="api-model-toggle">Use On-Device Model (Gemini Nano):</label>
+      <label class="switch">
+        <input type="checkbox" id="api-model-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <button id="save-options">Save Settings</button>
+  </section>
+
+  <hr>
+
+  <section id="prompt-management">
+    <h2>Prompt Management</h2>
+    <div id="prompts-list">
+      <!-- Prompts will be loaded here -->
+    </div>
+    <h3>Add New Prompt</h3>
+    <div id="add-prompt-form">
+      <label for="new-prompt-name">Prompt Name:</label>
+      <input type="text" id="new-prompt-name" placeholder="Enter prompt name">
+      <label for="new-prompt-prompt">Prompt Text:</label>
+      <textarea id="new-prompt-prompt" placeholder="Enter prompt text..."></textarea>
+      <button id="add-prompt-button">Add Prompt</button>
+    </div>
+  </section>
+
+  <script src="options.js"></script>
+</body>
+</html>

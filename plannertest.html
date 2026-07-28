@@ -1,0 +1,423 @@
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isolated-Section AI Web Builder</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f4f6f8; 
+            display: grid; 
+            grid-template-columns: 400px 1fr; 
+            gap: 20px; 
+            height: 95vh; 
+            box-sizing: border-box;
+        }
+        
+        h1 { color: #1a1a1a; grid-column: 1 / -1; margin: 0 0 20px 0; font-size: 24px; }
+        
+        /* Left Panel */
+        .controls-panel { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        /* Right Panel */
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 100%;
+        }
+
+        /* Inputs */
+        label { font-weight: 700; font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        textarea { 
+            padding: 12px; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            width: 100%; 
+            box-sizing: border-box; 
+            height: 100px; 
+            resize: none; 
+            font-family: "Menlo", "Consolas", monospace; 
+            background: #fafafa;
+        }
+        textarea:focus { outline: none; border-color: #007bff; background: white; }
+        
+        /* Buttons */
+        button { 
+            padding: 14px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 15px; 
+            font-weight: 600; 
+            transition: all 0.2s; 
+            margin-top: auto;
+        }
+        button:hover { background: #0056b3; transform: translateY(-1px); }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* API Status */
+        #api-status { padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 500; text-align: center; }
+        .status-ok { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .status-err { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+
+        /* Logs */
+        .log-container { 
+            flex: 1; 
+            overflow-y: auto; 
+            border: 1px solid #e0e0e0; 
+            background: white; 
+            border-radius: 12px; 
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-header { padding: 10px 15px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; background: #fcfcfc; font-size: 13px; text-transform: uppercase; }
+        .log-content { padding: 15px; overflow-y: auto; flex: 1; }
+
+        .log-entry { 
+            margin-bottom: 15px; 
+            padding: 12px; 
+            border-radius: 8px; 
+            border-left: 4px solid #ccc; 
+            background: #f8f9fa; 
+            font-size: 13px; 
+        }
+        
+        .log-planner { border-left-color: #9c27b0; background: #fdf5ff; }
+        .log-tool { border-left-color: #ff9800; background: #fff8e1; } 
+        .log-executor { border-left-color: #2e7d32; background: #e8f5e9; }
+        .log-error { border-left-color: #d32f2f; background: #ffebee; color: #d32f2f; }
+        
+        .step-title { font-weight: 700; display: block; margin-bottom: 6px; color: #333; }
+        pre { white-space: pre-wrap; margin: 0; font-family: "Menlo", monospace; color: #666; }
+
+        /* Preview */
+        .preview-wrapper { flex: 1; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: white; display: flex; flex-direction: column; }
+        .preview-header { padding: 10px 15px; background: #f8f9fa; border-bottom: 1px solid #eee; font-size: 12px; color: #666; font-weight: 600; text-transform: uppercase; }
+        iframe { flex: 1; border: none; width: 100%; background: white; }
+    </style>
+</head>
+<body>
+
+    <h1>ð¤ Chrome Local AI Web Builder</h1>
+    
+    <div class="controls-panel">
+        <div id="api-status">Checking API...</div>
+
+        <label for="sourceText">1. InnerText Content</label>
+        <textarea id="sourceText" placeholder="Paste raw content...">
+Recipe: Roasted Red Pepper Tomato Soup.
+Ingredients: 4 red peppers, 1 onion, 2 cans tomatoes, 1 tsp thyme, 4 cups broth.
+Steps: Roast peppers. Saute onions. Simmer all. Blend.
+Notes: Serve with crusty bread.
+        </textarea>
+
+        <label for="imageList">2. Image List</label>
+        <textarea id="imageList" placeholder="Comma separated URLs">
+https://placehold.co/800x300/e74c3c/FFF?text=Soup+Hero
+        </textarea>
+
+        <label for="userGoal">3. User Instructions</label>
+        <textarea id="userGoal">Create a warm, rustic recipe page for the Roasted Red Pepper Tomato Soup.</textarea>
+
+        <button id="runBtn">Generate Web Page</button>
+    </div>
+
+    <div class="preview-panel">
+        <div class="log-container">
+            <div class="log-header">Agent Logs</div>
+            <div class="log-content" id="logOutput"></div>
+        </div>
+        
+        <div class="preview-wrapper">
+            <div class="preview-header">Live Render</div>
+            <iframe id="previewFrame"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // --- UTILS ---
+        const logDiv = document.getElementById('logOutput');
+        const statusDiv = document.getElementById('api-status');
+        const previewFrame = document.getElementById('previewFrame');
+
+        function log(type, title, content) {
+            const div = document.createElement('div');
+            div.className = `log-entry log-${type}`;
+            div.innerHTML = `<span class="step-title">${title}</span><pre>${content.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>`;
+            logDiv.appendChild(div);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updatePreview(htmlContent) {
+            const doc = previewFrame.contentWindow.document;
+            doc.open();
+            doc.write(htmlContent);
+            doc.close();
+        }
+
+        async function checkApi() {
+            if (!window.LanguageModel) {
+                statusDiv.innerText = "â window.LanguageModel missing. Check flags.";
+                statusDiv.className = "status-err";
+                document.getElementById('runBtn').disabled = true;
+                return false;
+            }
+            try {
+                const availability = await window.LanguageModel.availability();
+                if (availability !== "readily") {
+                    statusDiv.innerText = `â ï¸ Model status: ${availability}`;
+                    statusDiv.className = "status-err";
+                    return false;
+                }
+                statusDiv.innerText = "â API Ready";
+                statusDiv.className = "status-ok";
+                return true;
+            } catch (e) {
+                statusDiv.innerText = "â ï¸ API Check Failed";
+                return true; 
+            }
+        }
+        checkApi();
+
+        // --- SCHEMAS ---
+        const sectionPlanSchema = {
+            type: "object",
+            properties: {
+                sections: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            sectionName: { type: "string" },
+                            extractionQuery: { 
+                                type: "string", 
+                                description: "A HIGHLY SPECIFIC query for the extraction tool (e.g., 'Extract ingredients and measurements for X')." 
+                            },
+                            generationInstruction: { 
+                                type: "string", 
+                                description: "Detailed instruction for the HTML writer. Include style notes here since the writer won't see the global user goal." 
+                            }
+                        },
+                        required: ["sectionName", "extractionQuery", "generationInstruction"]
+                    }
+                }
+            },
+            required: ["sections"],
+            additionalProperties: false
+        };
+
+        // --- AGENT SYSTEM ---
+        class WebBuilderAgent {
+            constructor() {
+                this.planner = null;
+                this.executor = null;
+                this.extractor = null;
+            }
+
+            async init() {
+                if (this.planner) return;
+
+                const config = {
+                    expectedInputs: [{ type: "text", languages: ["en"] }],
+                    expectedOutputs: [{ type: "text", languages: ["en"] }]
+                };
+
+                // 1. Planner: Decides layout based on User Goal + Title
+                this.planner = await window.LanguageModel.create({
+                    systemPrompt: `You are a Website Architect. 
+                    
+                    TASK:
+                    Create a list of logical sections for a webpage based SOLELY on the 'User Prompt' and 'Page Title'.
+
+                    RULES:
+                    1. NO DUPLICATE SECTIONS.
+                    2. Resolve conflicts based on the User Prompt.
+                    3. SPECIFICITY RULE: When writing 'extractionQuery', NEVER use single words like 'Ingredients'. Always specify WHAT to extract and WHAT it is for.
+                    4. IMPORTANT: The HTML Writer will NOT see the 'User Prompt'. You must bake all style instructions (e.g. 'rustic style', 'bold font') into the 'generationInstruction' field for each section.`,
+                    ...config
+                });
+
+                // 2. Extractor (The Tool)
+                this.extractor = await window.LanguageModel.create({
+                    systemPrompt: "You are an Information Extraction Tool. Given a long text and a specific query, extract ONLY the relevant information requested. If it doesn't exist, say 'No information found'. Be concise.",
+                    ...config
+                });
+
+                // 3. Executor (The Builder)
+                this.executor = await window.LanguageModel.create({
+                    systemPrompt: "You are a Frontend Developer. Write the valid HTML code for a single section. Use the provided 'Instruction' and 'Extracted Content'. Do not look for context outside this section.",
+                    ...config
+                });
+            }
+
+            // --- TOOL: EXTRACT ---
+            async getInfo(query, fullText) {
+                log('tool', `Extracting: "${query}"`, "Scanning source text...");
+                const prompt = `SOURCE TEXT:\n${fullText}\n\nQUERY: ${query}`;
+                const result = await this.extractor.prompt(prompt);
+                log('tool', `Found Content`, result);
+                return result;
+            }
+
+            // --- PLANNER ---
+            async createSectionList(userGoal, pageTitle) {
+                log('planner', 'Planning Sections', `Goal: "${userGoal}"\nTitle: "${pageTitle}"`);
+                
+                const prompt = `
+                PAGE TITLE: ${pageTitle}
+                USER PROMPT: ${userGoal}
+                
+                List the sections needed for this page. Ensure 'generationInstruction' contains all necessary style details.
+                `;
+
+                const response = await this.planner.prompt(
+                    [{ role: "user", content: prompt }],
+                    { responseConstraint: sectionPlanSchema }
+                );
+                
+                const plan = JSON.parse(response);
+                log('planner', 'Section List Created', JSON.stringify(plan.sections, null, 2));
+                return plan.sections;
+            }
+
+            // --- EXECUTOR (ISOLATED) ---
+            // Note: userGoal is REMOVED from this method signature and prompt
+            async buildSectionHtml(section, extractedContent, imageList) {
+                log('executor', `Building: ${section.sectionName}`, section.generationInstruction);
+
+                const prompt = `
+                CURRENT SECTION: ${section.sectionName}
+                INSTRUCTION: ${section.generationInstruction}
+                CONTENT TO USE: ${extractedContent}
+                AVAILABLE IMAGES: ${imageList}
+                
+                Write valid HTML for this section based strictly on the instruction above.
+                `;
+
+                const result = await this.executor.prompt(prompt);
+                return result.replace(/```html|```/g, '').trim();
+            }
+
+            // --- MAIN RUN LOOP ---
+            async run(userGoal, sourceText, imageList) {
+                const btn = document.getElementById('runBtn');
+                btn.disabled = true;
+                btn.textContent = "Building...";
+                logDiv.innerHTML = '';
+                updatePreview(""); 
+
+                try {
+                    await this.init();
+                    let fullHtml = "";
+
+                    // --- PHASE 1: SETUP (Title & Header) ---
+                    // Updated Query: Strict, no options, no description
+                    const titleRaw = await this.getInfo("Extract a single, short, descriptive title from this text. Output ONLY the title text.", sourceText);
+                    const titleClean = titleRaw.replace(/"/g, '').replace(/Title:/i, '').trim();
+
+                    fullHtml += `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${titleClean}</title>
+    <style>
+        body { font-family: 'Georgia', serif; margin: 0; padding: 0; color: #4a4a4a; line-height: 1.6; background: #fffcf5; }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        img { max-width: 100%; border-radius: 4px; display: block; margin: 20px 0; }
+        .section-box { margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #e0dacc; }
+        h1 { font-family: 'Segoe UI', sans-serif; font-size: 2.5em; color: #d35400; margin-bottom: 10px; text-align: center;}
+        h2 { font-family: 'Segoe UI', sans-serif; color: #e67e22; border-left: 4px solid #d35400; padding-left: 15px; }
+        ul, ol { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header style="text-align:center; margin-bottom: 40px;">
+        <h1>${titleClean}</h1>
+    </header>
+`;
+                    updatePreview(fullHtml);
+
+                    // --- PHASE 2: PLAN (Sections) ---
+                    const sections = await this.createSectionList(userGoal, titleClean);
+
+                    // --- PHASE 3: LOOP (Extract -> Build) ---
+                    for (const section of sections) {
+                        
+                        // 1. Tool Usage
+                        const content = await this.getInfo(section.extractionQuery, sourceText);
+
+                        // 2. LLM Usage (Isolated)
+                        // Note: userGoal is NOT passed here
+                        const htmlChunk = await this.buildSectionHtml(section, content, imageList);
+                        
+                        // 3. Append
+                        fullHtml += `\n<div class="section-box">\n${htmlChunk}\n</div>`;
+                        updatePreview(fullHtml);
+                    }
+
+                    // --- PHASE 4: TEARDOWN ---
+                    fullHtml += "\n</div></body></html>";
+                    updatePreview(fullHtml);
+                    log('executor', 'Finalizing', 'Closed HTML tags.');
+
+                } catch (e) {
+                    log('error', 'Error', e.message);
+                    console.error(e);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = "Generate Web Page";
+                }
+            }
+        }
+
+        const agent = new WebBuilderAgent();
+        document.getElementById('runBtn').addEventListener('click', () => {
+            const goal = document.getElementById('userGoal').value;
+            const text = document.getElementById('sourceText').value;
+            const images = document.getElementById('imageList').value;
+            if (goal) agent.run(goal, text, images);
+        });
+    </script>
+</body>
+</html>
+
